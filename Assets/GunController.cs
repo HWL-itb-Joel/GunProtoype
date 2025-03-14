@@ -21,6 +21,7 @@ public class GunController : MonoBehaviour
     private InputAction reloadAction;
     private InputAction lookAction;
     private InputAction scrollWeapons;
+    private InputAction alternativeShoot;
 
     private Vector2 lookInput;
     private float scroll;
@@ -29,8 +30,9 @@ public class GunController : MonoBehaviour
     public int _currentAmmoInClip;
     public int _ammoInReserve;
     public bool _canShoot;
+    public bool _canAlternShoot;
     private bool shootEnded;
-    private bool _gunEnabled;
+    public bool _gunEnabled;
     private bool firstThroweableEnabled;
 
     public int _currentAmmoInClipReserve;
@@ -50,8 +52,6 @@ public class GunController : MonoBehaviour
     [Header("Sway Settings")]
     public bool randomizeRecoil;
     public Vector2 randomRecoilConstrains;
-    //pattern recoil
-    public Vector2 recoilPattern;
 
     private void Awake()
     {
@@ -64,6 +64,7 @@ public class GunController : MonoBehaviour
         fireAction = PlayerInputs.FindActionMap("OnGround").FindAction("Fire");
         reloadAction = PlayerInputs.FindActionMap("OnGround").FindAction("Reload");
         lookAction = PlayerInputs.FindActionMap("OnGround").FindAction("Look");
+        alternativeShoot = PlayerInputs.FindActionMap("OnGround").FindAction("AlternativeShoot");
 
         lookAction.performed += context => lookInput = context.ReadValue<Vector2>();
         lookAction.canceled += context => lookInput = Vector2.zero;
@@ -73,6 +74,7 @@ public class GunController : MonoBehaviour
 
     private void OnEnable()
     {
+        alternativeShoot.Enable();
         scrollWeapons.Enable();
         fireAction.Enable();
         reloadAction.Enable();
@@ -81,6 +83,7 @@ public class GunController : MonoBehaviour
 
     private void OnDisable()
     {
+        alternativeShoot.Disable();
         scrollWeapons.Disable();
         fireAction.Disable();
         reloadAction.Disable();
@@ -95,6 +98,8 @@ public class GunController : MonoBehaviour
         _currentAmmoInClipReserve = secundayWeapon.clipSize;
         _ammoInReserveReserve = secundayWeapon.reservedAmmoCapacity;
         _canShoot = true;
+        _canAlternShoot = true;
+        weaponInfo.currentHeat = 0;
         firstThroweableEnabled = true;
         _gunEnabled = true;
     }
@@ -142,6 +147,31 @@ public class GunController : MonoBehaviour
         {
             ChangeGunWeapon();
         }
+
+        if (alternativeShoot.IsPressed() && weaponInfo.alternativeShoot && _canAlternShoot)
+        {
+            ChangeAlternativeShoot();
+        }
+        else if (!alternativeShoot.IsPressed())
+        {
+            _canAlternShoot = true;
+        }
+        if (!weaponInfo.isOverheated)
+        {
+            if (weaponInfo.currentHeat > 0)
+            {
+                // Si no estamos disparando, comenzar el enfriamiento progresivo
+                if (!weaponInfo.isCooling)
+                {
+                    weaponInfo.isCooling = true;
+                    StartCoroutine(IncreaseCoolingRate());
+                }
+
+                float coolingRate = Mathf.Lerp(weaponInfo.baseCoolingRate, weaponInfo.maxCoolingRate, weaponInfo.coolingMultiplier);
+                weaponInfo.currentHeat -= coolingRate * Time.deltaTime;
+                weaponInfo.currentHeat = Mathf.Max(0, weaponInfo.currentHeat);
+            }
+        }
     }
 
     void DetermineRotation()
@@ -185,12 +215,13 @@ public class GunController : MonoBehaviour
 
     IEnumerator ShootGun()
     {
+        Debug.Log("Pium");
         if (weaponInfo.rateType == fireRateType.Auto)
         {
             _canShoot = false;
             _currentAmmoInClip--;
             DetermineRecoil();
-            RatCastForEnemy();
+            RatCastForEnemy(weaponInfo.sprayBullets);
             yield return new WaitForSeconds(weaponInfo.fireRate);
             _canShoot = true;
         }
@@ -201,7 +232,7 @@ public class GunController : MonoBehaviour
             {
                 _currentAmmoInClip--;
                 DetermineRecoil();
-                RatCastForEnemy();
+                RatCastForEnemy(weaponInfo.sprayBullets);
                 yield return new WaitForSeconds(weaponInfo.bulletsFireRate);
             }
             yield return new WaitForSeconds(weaponInfo.fireRate);
@@ -209,25 +240,50 @@ public class GunController : MonoBehaviour
         }
         else if (weaponInfo.rateType == fireRateType.OneShot)
         {
-            _canShoot = false;
-            shootEnded = false;
-            _currentAmmoInClip -= weaponInfo.bulletsByShot;
-            DetermineRecoil();
-            RatCastForEnemy();
+            for (int i = 0; i < weaponInfo.bulletsByShot; i++)
+            {
+                if (_currentAmmoInClip <= 0) break;
+                _canShoot = false;
+                shootEnded = false;
+                _currentAmmoInClip--;
+                DetermineRecoil();
+                RatCastForEnemy(weaponInfo.sprayBullets);
+            }
+            
             yield return new WaitForSeconds(weaponInfo.fireRate);
             shootEnded = true;
         }
+        else if (weaponInfo.rateType == fireRateType.OverHeating && !weaponInfo.isOverheated)
+        {
+            weaponInfo.isCooling = false;
+            weaponInfo.currentHeat += 0.1f;
+            Debug.Log(" Heat level: " + weaponInfo.currentHeat);
+            if (weaponInfo.currentHeat >= weaponInfo.heatThreshold)
+            {
+                StartCoroutine(Overheat());
+            }
+        }
     }
 
-    void RatCastForEnemy()
+    void RatCastForEnemy(bool srpay)
     {
         RaycastHit hit;
-        if (Physics.Raycast(transform.parent.position, transform.parent.forward, out hit, weaponInfo.maxDistance))
+        Vector3 sprayIndicator = new Vector3(Random.Range(-weaponInfo.sprayIndicator, weaponInfo.sprayIndicator), Random.Range(-weaponInfo.sprayIndicator, weaponInfo.sprayIndicator),0);
+        if (!srpay)
         {
-            Debug.DrawRay(transform.parent.position, hit.point, Color.red, 834485f);
+            sprayIndicator = Vector2.zero;
+        }
+
+        Vector3 dir = (Camera.main.transform.forward * 180) + sprayIndicator;
+        if (Physics.Raycast(Camera.main.transform.position, dir, out hit, weaponInfo.maxDistance))
+        {
+            Debug.DrawRay(Camera.main.transform.position, dir, Color.red, 834485f);
             try
             {
-                Debug.Log("Hit an enemy");
+                GameObject feedback = Instantiate(weaponInfo.feedback);
+                feedback.transform.position = hit.point;
+                feedback.transform.rotation = Quaternion.Euler(hit.normal);
+                Destroy(feedback, 3f);
             }
             catch { }
         }
@@ -273,4 +329,58 @@ public class GunController : MonoBehaviour
             _ammoInReserve -= amountNeeded;
         }
     }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.red;
+        Debug.DrawLine(Camera.main.transform.position, Camera.main.transform.forward * 180,Color.red);
+    }
+
+    void ChangeAlternativeShoot()
+    {
+        _canAlternShoot = false;
+        Debug.Log("Alternative Shoot Enabled");
+        fireRateType rateType = weaponInfo.rateType;
+        int tempBulletsByShoot = weaponInfo.bulletsByShot;
+        bool tempSparyBullets = weaponInfo.sprayBullets;
+        float tempSprayIndicator = weaponInfo.sprayIndicator;
+        int tempDamage = weaponInfo.damage;
+        float tempFireRate = weaponInfo.fireRate;
+
+        weaponInfo.rateType = weaponInfo.alternativeType;
+        weaponInfo.bulletsByShot = weaponInfo.alternativeBulletsByShoot;
+        weaponInfo.sprayBullets = weaponInfo.alternativeSpray;
+        weaponInfo.sprayIndicator = weaponInfo.alternativeSprayIndicator;
+        weaponInfo.damage = weaponInfo.alternativeDamage;
+        weaponInfo.fireRate = weaponInfo.alternativeFireRate;
+
+        weaponInfo.alternativeType = rateType;
+        weaponInfo.alternativeBulletsByShoot = tempBulletsByShoot;
+        weaponInfo.alternativeSpray = tempSparyBullets;
+        weaponInfo.alternativeSprayIndicator = tempSprayIndicator;
+        weaponInfo.alternativeDamage = tempDamage;
+        weaponInfo.alternativeFireRate = tempFireRate;
+    }
+
+    private IEnumerator Overheat()
+    {
+        weaponInfo.isOverheated = true;
+        Debug.Log("🚨 Weapon overheated! Cooling down...");
+        yield return new WaitForSeconds(weaponInfo.overheatCooldown);
+        weaponInfo.currentHeat = 0f;
+        weaponInfo.isOverheated = false;
+        Debug.Log("✅ Weapon cooled down. Ready to fire!");
+    }
+
+    private IEnumerator IncreaseCoolingRate()
+    {
+        weaponInfo.coolingMultiplier = 0f;
+        while (weaponInfo.isCooling && weaponInfo.coolingMultiplier < 1f)
+        {
+            weaponInfo.coolingMultiplier += Time.deltaTime / weaponInfo.coolingAccelerationTime;
+            weaponInfo.coolingMultiplier = Mathf.Clamp01(weaponInfo.coolingMultiplier);
+            yield return null;
+        }
+    }
+
 }

@@ -15,11 +15,30 @@ MonoBehaviour:
   weaponName: Secun
   weaponType: 1
   prefab: {fileID: 4734564968589155753, guid: 1f07b20400994487d974e89dccdd1891, type: 3}
-  position: {x: 0, y: 0, z: 0}
+  feedback: {fileID: 3767975676577083156, guid: 9112da23f8ff14e948c14f55e07f67d3, type: 3}
   fireRate: 0.075
   rateType: 2
   bulletsByShot: 1
+  sprayBullets: 0
+  sprayIndicator: 0
   bulletsFireRate: 0
+  maxDistance: 50
   damage: 15
   clipSize: 15
   reservedAmmoCapacity: 999
+  alternativeShoot: 1
+  alternativeType: 2
+  alternativeBulletsByShoot: 3
+  alternativeSpray: 1
+  alternativeSprayIndicator: 10
+  alternativeDamage: 30
+  alternativeFireRate: 0.5
+  heatThreshold: 0
+  currentHeat: 0
+  overheatCooldown: 0
+  isOverheated: 0
+  baseCoolingRate: 0
+  maxCoolingRate: 0
+  coolingAccelerationTime: 0
+  coolingMultiplier: 0
+  isCooling: 0

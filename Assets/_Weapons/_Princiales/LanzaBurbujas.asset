@@ -10,35 +10,35 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ae05082e79f294ac091c913526022ae0, type: 3}
-  m_Name: Escopeta
+  m_Name: LanzaBurbujas
   m_EditorClassIdentifier: 
-  weaponName: Escopeta
+  weaponName: LanzaBurbujas
   weaponType: 0
-  prefab: {fileID: 7483931340076549098, guid: 7c8311a0b559e416e86362c591dca197, type: 3}
+  prefab: {fileID: 2538686807373999617, guid: 863cf8b7c6c39493f85dc79fb2b318cb, type: 3}
   feedback: {fileID: 3767975676577083156, guid: 9112da23f8ff14e948c14f55e07f67d3, type: 3}
-  fireRate: 0.5
-  rateType: 2
-  bulletsByShot: 3
-  sprayBullets: 1
-  sprayIndicator: 10
+  fireRate: 0
+  rateType: 3
+  bulletsByShot: 1
+  sprayBullets: 0
+  sprayIndicator: 0
   bulletsFireRate: 0
-  maxDistance: 10
-  damage: 60
-  clipSize: 9
-  reservedAmmoCapacity: 45
+  maxDistance: 0
+  damage: 5
+  clipSize: 1
+  reservedAmmoCapacity: 0
   alternativeShoot: 0
   alternativeType: 0
-  alternativeBulletsByShoot: 0
+  alternativeBulletsByShoot: 1
   alternativeSpray: 0
   alternativeSprayIndicator: 0
   alternativeDamage: 0
   alternativeFireRate: 0
-  heatThreshold: 0
+  heatThreshold: 100
   currentHeat: 0
-  overheatCooldown: 0
+  overheatCooldown: 10
   isOverheated: 0
-  baseCoolingRate: 0
-  maxCoolingRate: 0
-  coolingAccelerationTime: 0
-  coolingMultiplier: 0
-  isCooling: 0
+  baseCoolingRate: 1
+  maxCoolingRate: 20
+  coolingAccelerationTime: 3
+  coolingMultiplier: 1
+  isCooling: 1

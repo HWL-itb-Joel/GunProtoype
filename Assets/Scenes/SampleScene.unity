@@ -342,7 +342,7 @@ MonoBehaviour:
   sprintMultiplier: 2
   jumpForce: 5
   gravity: 9.81
-  mouseSensitivity: 2
+  mouseSensitivity: 1
   upDownRange: 80
   footstepSource: {fileID: 0}
   footsteoSounds: []
@@ -567,7 +567,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.121176384, y: 0, z: 0, w: 0.992631}
+  m_LocalRotation: {x: -0.053294614, y: 0, z: 0, w: 0.99857885}
   m_LocalPosition: {x: 0, y: 0.75, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -575,7 +575,7 @@ Transform:
   - {fileID: 1090372684}
   - {fileID: 1348972228}
   m_Father: {fileID: 890927784}
-  m_LocalEulerAnglesHint: {x: 13.92, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: -6.11, y: 0, z: 0}
 --- !u!1 &1090372683
 GameObject:
   m_ObjectHideFlags: 0
@@ -685,7 +685,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1348972227}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -713,6 +713,8 @@ MonoBehaviour:
   _currentAmmoInClip: 0
   _ammoInReserve: 0
   _canShoot: 0
+  _canAlternShoot: 0
+  _gunEnabled: 0
   _currentAmmoInClipReserve: 0
   _ammoInReserveReserve: 0
   mouseSensitiity: 0.2
@@ -720,8 +722,7 @@ MonoBehaviour:
   maxSway: 0.1
   smoothSpeed: 6
   randomizeRecoil: 1
-  randomRecoilConstrains: {x: -1, y: 1}
-  recoilPattern: {x: 0, y: 0}
+  randomRecoilConstrains: {x: 1, y: 1}
 --- !u!1 &1607526036
 GameObject:
   m_ObjectHideFlags: 0

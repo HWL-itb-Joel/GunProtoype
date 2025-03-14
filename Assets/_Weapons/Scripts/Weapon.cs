@@ -8,4 +8,5 @@ public abstract class Weapon : ScriptableObject
     public string weaponName;
     public WeaponType weaponType;
     public GameObject prefab;
+    public GameObject feedback;
 }
