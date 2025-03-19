@@ -282,7 +282,7 @@ public class GunController : MonoBehaviour
             {
                 GameObject feedback = Instantiate(weaponInfo.feedback);
                 feedback.transform.position = hit.point;
-                feedback.transform.rotation = Quaternion.Euler(hit.normal);
+                feedback.transform.rotation = Quaternion.Euler(Camera.main.transform.rotation.x * 180, (Camera.main.transform.rotation.y + hit.normal.y) * 180, Camera.main.transform.rotation.z * 180);
                 Destroy(feedback, 3f);
             }
             catch { }
