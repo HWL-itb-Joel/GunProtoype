@@ -78,6 +78,7 @@ public class FirstPlayerController : MonoBehaviour
 
     void Update()
     {
+        Debug.Log(lookInput);
         HandleRotation();
         HandleMovement();
         HandleFootsteps();
