@@ -8,9 +8,9 @@ public class GunController : MonoBehaviour
     [Header("Guns Selected")]
     private Gun weaponInfo;
     public Gun primaryWeapon;
-    private GameObject primaryObject;
+    private GameObject primaryObject = null;
     public Gun secundayWeapon;
-    private GameObject secundayObject;
+    private GameObject secundayObject = null;
     public MeleeWeapon meleeWeapon;
     public ThrowableWeapon throwableWeapon1;
     public ThrowableWeapon throwableWeapon2;
